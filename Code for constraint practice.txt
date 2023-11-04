@@ -1,0 +1,183 @@
+--lets create table
+
+create table customer
+(
+cust_id number(6),
+cust_name varchar2(50),
+mobile_no number(10),
+dob date,
+city varchar2(30),
+email_id varchar2(30)
+);
+
+--Looking for created table
+select * from customer;
+
+--Insert rows in customer table
+insert into customer
+(cust_id,cust_name,mobile_no,dob,city,email_id)
+values(100000,'Arun', 9090909090,to_date('08/04/2000','mm/dd/yyyy'),
+'Chennai','arun@gmail.com');
+insert into customer
+values(100001,'John', 9090909030,to_date('12/24/1986','mm/dd/yyyy'),
+'Bangaluru','john@gmail.com');
+
+insert into customer
+(cust_id,cust_name,dob,city,email_id)
+values(100002,'Geon',to_date('12/24/1985','mm/dd/yyyy'), 'Delhi','Geon@gmail.com');
+
+--to save query
+commit;
+
+--lets learn concept of rollback now
+--lets insert one more row
+insert into customer (cust_id,cust_name,mobile_no,dob,city,email_id) values
+(100006,'Ram',984562291,to_date('11/10/1988','mm/dd/yyyy'), 'Nepal','ram@gmail.com');
+
+rollback;
+
+--lets again select data from customer to see imapact of rollback
+select * from customer;
+
+--we rollback so it does not saved new row, so lets insert again and lets commit it
+insert into customer (cust_id,cust_name,mobile_no,dob,city,email_id) values
+(100006,'Ram',984562291,to_date('11/10/1988','mm/dd/yyyy'), 'Nepal','ram@gmail.com');
+
+--commit
+commit;
+
+--select to see whether it got inserted or not after we commit
+select * from customer;
+
+--adding mobile_no in row 3 or updating row 3
+update customer 
+set mobile_no=1212121212 where cust_id=100002; 
+--to save commit it
+commit;
+--see again table
+select * from customer;
+
+--using alert, we are changing cust_id number from 6 to 8 
+alter table customer
+modify cust_id number(8);
+
+commit;
+
+--now again alert to change number 
+alter table customer
+modify city varchar2(15)
+
+--i do not want to change it so i rollback
+rollback;
+
+--desc, it shows data types and column name
+desc customer;
+
+--delete
+DELETE FROM customer WHERE cust_name = 'Arun';
+--At first I got error, be careful, I quoted with double quote ( “ ”)to Arun, I got error, it should be with single quote (‘ ’)
+
+--rollback
+rollback;
+
+--truncate
+truncate table customer;
+
+--lets look, how it look after truncate
+select * from customer;
+--all rows got deleted
+--we cannot rollback too
+rollback;
+select*from customer;
+
+--DROP
+drop table customer;
+
+--We have already delete and drop everything so we have to create new one again
+CREATE TABLE staff (
+    employee_id NUMBER(5) PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    email VARCHAR2(100) UNIQUE,
+    hire_date DATE,
+    salary NUMBER(10, 2)
+);
+
+--Next table
+CREATE TABLE product (
+    product_id NUMBER(5),
+    product_name VARCHAR2(100),
+    category VARCHAR2(50),
+    price NUMBER(10, 2)
+);
+--add primary key in product table
+ALTER TABLE product
+ADD CONSTRAINT product_pk PRIMARY KEY (product_id);
+
+--lets create new table to practice all constraint
+create table people(
+people_id number(5) primary key,
+people_fname varchar(25),
+people_lname varchar(30),
+date_of_birth date not null,
+email varchar(100) unique,
+age number(3) check(age>16)
+);
+
+-- Inserting data into the "people" table
+INSERT INTO people (people_id, people_fname, people_lname, date_of_birth, email, age)
+VALUES (1, 'John', 'Doe', TO_DATE('1990-05-15', 'YYYY-MM-DD'), 'john.doe@example.com', 33);
+
+INSERT INTO people (people_id, people_fname, people_lname, date_of_birth, email, age)
+VALUES (2, 'Alice', 'Smith', TO_DATE('1985-12-10', 'YYYY-MM-DD'), 'alice.smith@example.com', 38);
+
+INSERT INTO people (people_id, people_fname, people_lname, date_of_birth, email, age)
+VALUES (3, 'Michael', 'Johnson', TO_DATE('2000-07-20', 'YYYY-MM-DD'), 'michael.j@example.com', 23);
+
+INSERT INTO people (people_id, people_fname, people_lname, date_of_birth, email, age)
+VALUES (4, 'Emily', 'Brown', TO_DATE('1998-03-25', 'YYYY-MM-DD'), 'emily.b@example.com', 25);
+
+INSERT INTO people (people_id, people_fname, people_lname, date_of_birth, email, age)
+VALUES (5, 'David', 'Miller', TO_DATE('1980-09-05', 'YYYY-MM-DD'), 'david.m@example.com', 43);
+
+    
+--select
+select * from people;
+
+--select people name id larger than 3
+select people_fname from people
+where people_id>3;
+
+--Delete cascade
+-- lets create two table first
+CREATE TABLE ITdepartment(
+    department_id NUMBER PRIMARY KEY,
+    department_name VARCHAR2(50)
+);
+
+CREATE TABLE ITemployee(
+    employee_id NUMBER PRIMARY KEY,
+    employee_name VARCHAR2(50),
+    department_id NUMBER,
+    CONSTRAINT fk_department_id
+        FOREIGN KEY (department_id)
+        REFERENCES ITdepartment(department_id)
+        ON DELETE CASCADE
+);
+
+--Insering values
+-- Insert some data
+INSERT INTO ITdepartment (department_id, department_name) VALUES (1, 'HR');
+INSERT INTO ITemployee (employee_id, employee_name, department_id) VALUES (101, 'John Doe', 1);
+INSERT INTO ITemployee (employee_id, employee_name, department_id) VALUES (102, 'Jane Smith', 1);
+
+-- Check data in both tables
+SELECT * FROM ITdepartment;
+SELECT * FROM ITemployee;
+
+-- Delete a department, and employees associated with it will be deleted automatically
+DELETE FROM ITdepartment WHERE department_id = 1;
+
+-- Check the data again
+SELECT * FROM departments;
+SELECT * FROM employees;
